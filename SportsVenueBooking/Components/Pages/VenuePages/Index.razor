@@ -1,0 +1,43 @@
+﻿@page "/venues"
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using SportsVenueBooking.Domain
+@using SportsVenueBooking.Data
+@implements IAsyncDisposable
+@inject IDbContextFactory<SportsVenueBooking.Data.SportsVenueBookingContext> DbFactory
+
+<PageTitle>Index</PageTitle>
+
+<h1>Index</h1>
+
+<p>
+    <a href="venues/create">Create New</a>
+</p>
+
+<QuickGrid Class="table" Items="context.Venue">
+    <PropertyColumn Property="venue => venue.Name" />
+    <PropertyColumn Property="venue => venue.Description" />
+    <PropertyColumn Property="venue => venue.Capacity" />
+    <PropertyColumn Property="venue => venue.BookingRate" />
+    <PropertyColumn Property="venue => venue.DateCreated" />
+    <PropertyColumn Property="venue => venue.DateUpdated" />
+    <PropertyColumn Property="venue => venue.Createdby" />
+    <PropertyColumn Property="venue => venue.Updatedby" />
+
+    <TemplateColumn Context="venue">
+        <a href="@($"venues/edit?id={venue.Id}")">Edit</a> |
+        <a href="@($"venues/details?id={venue.Id}")">Details</a> |
+        <a href="@($"venues/delete?id={venue.Id}")">Delete</a>
+    </TemplateColumn>
+</QuickGrid>
+
+@code {
+    private SportsVenueBookingContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = DbFactory.CreateDbContext();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

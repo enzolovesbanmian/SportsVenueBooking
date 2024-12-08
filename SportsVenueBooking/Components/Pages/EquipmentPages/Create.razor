@@ -1,0 +1,89 @@
+﻿@page "/equipment/create"
+@using Microsoft.EntityFrameworkCore
+@using SportsVenueBooking.Domain
+@inject IDbContextFactory<SportsVenueBooking.Data.SportsVenueBookingContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create</PageTitle>
+
+<h1>Create</h1>
+
+<h2>Equipment</h2>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <EditForm method="post" Model="Equipment" OnValidSubmit="AddEquipment" FormName="create" Enhance>
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" role="alert"/>
+            <div class="mb-3">
+                <label for="venueid" class="form-label">VenueId:</label> 
+                <InputText id="venueid" @bind-Value="Equipment.VenueId" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.VenueId" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="equipmentname" class="form-label">EquipmentName:</label> 
+                <InputText id="equipmentname" @bind-Value="Equipment.EquipmentName" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.EquipmentName" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="equipmentdescription" class="form-label">EquipmentDescription:</label> 
+                <InputText id="equipmentdescription" @bind-Value="Equipment.EquipmentDescription" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.EquipmentDescription" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="equipmentqty" class="form-label">EquipmentQty:</label> 
+                <InputNumber id="equipmentqty" @bind-Value="Equipment.EquipmentQty" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.EquipmentQty" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="equipmentavailibility" class="form-label">EquipmentAvailibility:</label> 
+                <InputCheckbox id="equipmentavailibility" @bind-Value="Equipment.EquipmentAvailibility" class="form-check-input" /> 
+                <ValidationMessage For="() => Equipment.EquipmentAvailibility" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="equipmentprice" class="form-label">EquipmentPrice:</label> 
+                <InputNumber id="equipmentprice" @bind-Value="Equipment.EquipmentPrice" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.EquipmentPrice" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="datecreated" class="form-label">DateCreated:</label> 
+                <InputDate id="datecreated" @bind-Value="Equipment.DateCreated" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.DateCreated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="dateupdated" class="form-label">DateUpdated:</label> 
+                <InputDate id="dateupdated" @bind-Value="Equipment.DateUpdated" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.DateUpdated" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="createdby" class="form-label">Createdby:</label> 
+                <InputText id="createdby" @bind-Value="Equipment.Createdby" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.Createdby" class="text-danger" /> 
+            </div>        
+            <div class="mb-3">
+                <label for="updatedby" class="form-label">Updatedby:</label> 
+                <InputText id="updatedby" @bind-Value="Equipment.Updatedby" class="form-control" /> 
+                <ValidationMessage For="() => Equipment.Updatedby" class="text-danger" /> 
+            </div>        
+            <button type="submit" class="btn btn-primary">Create</button>
+        </EditForm>
+    </div>
+</div>
+
+<div>
+    <a href="/equipment">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromForm]
+    private Equipment Equipment { get; set; } = new();
+
+    // To protect from overposting attacks, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task AddEquipment()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Equipment.Add(Equipment);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/equipment");
+    }
+}

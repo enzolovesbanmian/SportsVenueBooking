@@ -1,0 +1,124 @@
+﻿@page "/venues/edit"
+@using Microsoft.EntityFrameworkCore
+@using SportsVenueBooking.Domain
+@inject IDbContextFactory<SportsVenueBooking.Data.SportsVenueBookingContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Venue</h2>
+<hr />
+@if (Venue is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Venue" OnValidSubmit="UpdateVenue" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Venue.Id" value="@Venue.Id" />
+                <div class="mb-3">
+                    <label for="name" class="form-label">Name:</label>
+                    <InputText id="name" @bind-Value="Venue.Name" class="form-control" />
+                    <ValidationMessage For="() => Venue.Name" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description:</label>
+                    <InputText id="description" @bind-Value="Venue.Description" class="form-control" />
+                    <ValidationMessage For="() => Venue.Description" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="capacity" class="form-label">Capacity:</label>
+                    <InputNumber id="capacity" @bind-Value="Venue.Capacity" class="form-control" />
+                    <ValidationMessage For="() => Venue.Capacity" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="bookingrate" class="form-label">BookingRate:</label>
+                    <InputNumber id="bookingrate" @bind-Value="Venue.BookingRate" class="form-control" />
+                    <ValidationMessage For="() => Venue.BookingRate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="Venue.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => Venue.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="Venue.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => Venue.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">Createdby:</label>
+                    <InputText id="createdby" @bind-Value="Venue.Createdby" class="form-control" />
+                    <ValidationMessage For="() => Venue.Createdby" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">Updatedby:</label>
+                    <InputText id="updatedby" @bind-Value="Venue.Updatedby" class="form-control" />
+                    <ValidationMessage For="() => Venue.Updatedby" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/venues">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Venue? Venue { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Venue ??= await context.Venue.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Venue is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdateVenue()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Venue!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!VenueExists(Venue!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/venues");
+    }
+
+    private bool VenueExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Venue.Any(e => e.Id == id);
+    }
+}

@@ -1,0 +1,64 @@
+﻿@page "/equipment/details"
+@using Microsoft.EntityFrameworkCore
+@using SportsVenueBooking.Domain
+@inject IDbContextFactory<SportsVenueBooking.Data.SportsVenueBookingContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Details</PageTitle>
+
+<h1>Details</h1>
+
+<div>
+    <h2>Equipment</h2>
+    <hr />
+    @if (equipment is null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else {
+        <dl class="row">
+            <dt class="col-sm-2">VenueId</dt>
+            <dd class="col-sm-10">@equipment.VenueId</dd>
+            <dt class="col-sm-2">EquipmentName</dt>
+            <dd class="col-sm-10">@equipment.EquipmentName</dd>
+            <dt class="col-sm-2">EquipmentDescription</dt>
+            <dd class="col-sm-10">@equipment.EquipmentDescription</dd>
+            <dt class="col-sm-2">EquipmentQty</dt>
+            <dd class="col-sm-10">@equipment.EquipmentQty</dd>
+            <dt class="col-sm-2">EquipmentAvailibility</dt>
+            <dd class="col-sm-10">@equipment.EquipmentAvailibility</dd>
+            <dt class="col-sm-2">EquipmentPrice</dt>
+            <dd class="col-sm-10">@equipment.EquipmentPrice</dd>
+            <dt class="col-sm-2">DateCreated</dt>
+            <dd class="col-sm-10">@equipment.DateCreated</dd>
+            <dt class="col-sm-2">DateUpdated</dt>
+            <dd class="col-sm-10">@equipment.DateUpdated</dd>
+            <dt class="col-sm-2">Createdby</dt>
+            <dd class="col-sm-10">@equipment.Createdby</dd>
+            <dt class="col-sm-2">Updatedby</dt>
+            <dd class="col-sm-10">@equipment.Updatedby</dd>
+        </dl>
+        <div>
+            <a href="@($"/equipment/edit?id={equipment.Id}")">Edit</a> |
+            <a href="@($"/equipment")">Back to List</a>
+        </div>
+    }
+</div>
+
+@code {
+    private Equipment? equipment;
+
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        equipment = await context.Equipment.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (equipment is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+}

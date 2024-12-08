@@ -1,0 +1,124 @@
+﻿@page "/payments/edit"
+@using Microsoft.EntityFrameworkCore
+@using SportsVenueBooking.Domain
+@inject IDbContextFactory<SportsVenueBooking.Data.SportsVenueBookingContext> DbFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Edit</PageTitle>
+
+<h1>Edit</h1>
+
+<h2>Payment</h2>
+<hr />
+@if (Payment is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <EditForm method="post" Model="Payment" OnValidSubmit="UpdatePayment" FormName="edit" Enhance>
+                <DataAnnotationsValidator />
+                <ValidationSummary role="alert"/>
+                <input type="hidden" name="Payment.Id" value="@Payment.Id" />
+                <div class="mb-3">
+                    <label for="bookingid" class="form-label">BookingId:</label>
+                    <InputText id="bookingid" @bind-Value="Payment.BookingId" class="form-control" />
+                    <ValidationMessage For="() => Payment.BookingId" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Amount:</label>
+                    <InputText id="amount" @bind-Value="Payment.Amount" class="form-control" />
+                    <ValidationMessage For="() => Payment.Amount" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="isapproved" class="form-label">IsApproved:</label>
+                    <InputCheckbox id="isapproved" @bind-Value="Payment.IsApproved" class="form-check-input" />
+                    <ValidationMessage For="() => Payment.IsApproved" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="paymentdate" class="form-label">PaymentDate:</label>
+                    <InputDate id="paymentdate" @bind-Value="Payment.PaymentDate" class="form-control" />
+                    <ValidationMessage For="() => Payment.PaymentDate" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="datecreated" class="form-label">DateCreated:</label>
+                    <InputDate id="datecreated" @bind-Value="Payment.DateCreated" class="form-control" />
+                    <ValidationMessage For="() => Payment.DateCreated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="dateupdated" class="form-label">DateUpdated:</label>
+                    <InputDate id="dateupdated" @bind-Value="Payment.DateUpdated" class="form-control" />
+                    <ValidationMessage For="() => Payment.DateUpdated" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="createdby" class="form-label">Createdby:</label>
+                    <InputText id="createdby" @bind-Value="Payment.Createdby" class="form-control" />
+                    <ValidationMessage For="() => Payment.Createdby" class="text-danger" />
+                </div>
+                <div class="mb-3">
+                    <label for="updatedby" class="form-label">Updatedby:</label>
+                    <InputText id="updatedby" @bind-Value="Payment.Updatedby" class="form-control" />
+                    <ValidationMessage For="() => Payment.Updatedby" class="text-danger" />
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </EditForm>
+        </div>
+    </div>
+}
+
+<div>
+    <a href="/payments">Back to List</a>
+</div>
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Payment? Payment { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        Payment ??= await context.Payment.FirstOrDefaultAsync(m => m.Id == Id);
+
+        if (Payment is null)
+        {
+            NavigationManager.NavigateTo("notfound");
+        }
+    }
+
+    // To protect from overposting attacks, enable the specific properties you want to bind to.
+    // For more information, see https://learn.microsoft.com/aspnet/core/blazor/forms/#mitigate-overposting-attacks.
+    private async Task UpdatePayment()
+    {
+        using var context = DbFactory.CreateDbContext();
+        context.Attach(Payment!).State = EntityState.Modified;
+
+        try
+        {
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!PaymentExists(Payment!.Id))
+            {
+                NavigationManager.NavigateTo("notfound");
+            }
+            else
+            {
+                throw;
+            }
+        }
+
+        NavigationManager.NavigateTo("/payments");
+    }
+
+    private bool PaymentExists(int id)
+    {
+        using var context = DbFactory.CreateDbContext();
+        return context.Payment.Any(e => e.Id == id);
+    }
+}
