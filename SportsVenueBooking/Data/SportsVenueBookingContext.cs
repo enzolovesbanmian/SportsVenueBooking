@@ -23,7 +23,7 @@ namespace SportsVenueBooking.Data
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-            builder.ApplyConfiguration(new VenueSeed());
+            builder.ApplyConfiguration(new VenueSeed()); //seed data for venue
 
         }
 
