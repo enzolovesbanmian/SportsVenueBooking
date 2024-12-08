@@ -16,6 +16,9 @@ namespace SportsVenueBooking.Data
         {
             base.OnModelCreating(builder);
             builder.ApplyConfiguration(new VenueSeed()); //seed data for venue
+            builder.ApplyConfiguration(new UserSeed());
+            builder.ApplyConfiguration(new UserRoleSeed());
+            builder.ApplyConfiguration(new RoleSeed());
 
         }
 
